@@ -31,6 +31,8 @@ _ST=$'\033[0m'
 _H2=$'\033[1;36m'
 _BD=$'\033[1m'
 _DM=$'\033[2m'
+_OK=$'\033[1;32m'
+_WRN=$'\033[1;33m'
 
 # Пары **текст** → жирный (без звёздочек на экране).
 # Важно: ${s%%\*\*} в bash отрезает только суффикс «**», а не «до первой пары» —
@@ -137,19 +139,46 @@ show_progress() {
 print_feedback_file() {
     local path=$1
     local ans="${2-}"
+    local tone="${3-}"
     local line
+    local color=""
+
+    case "$tone" in
+        ok) color="$_OK" ;;
+        err) color="$_WRN" ;;
+    esac
 
     if [[ ! -f "$path" ]]; then
         if [[ -n "$ans" ]]; then
-            echo "$(tpl_expand "Ответ «@ans@» не подходит. Нет файла уведомления: ${path##*/}" "$ans")"
+            line="$(tpl_expand "Ответ «@ans@» не подходит. Нет файла уведомления: ${path##*/}" "$ans")"
         else
-            echo "Нет файла уведомления: ${path##*/}"
+            line="Нет файла уведомления: ${path##*/}"
+        fi
+
+        if [[ -n "$color" ]]; then
+            printf '%b%s%b\n' "$color" "$line" "$_ST"
+        else
+            printf '%s\n' "$line"
         fi
 
         return 1
     fi
 
     while IFS= read -r line || [[ -n $line ]]; do
+        if [[ -n "$color" ]]; then
+            line="$(tpl_expand "${line%$'\r'}" "$ans")"
+
+            if [[ -z "${line// }" ]]; then
+                echo ""
+
+                continue
+            fi
+
+            printf '%b%s%b\n' "$color" "$line" "$_ST"
+
+            continue
+        fi
+
         print_formatted_line "${line%$'\r'}" "$ans"
     done < "$path"
 }
@@ -184,7 +213,7 @@ check_level_answer() {
 
         if [[ ! -f "$answer_file" ]]; then
             echo ""
-            print_feedback_file "$path_reject" "<нет файла ${answer_file}>"
+            print_feedback_file "$path_reject" "<нет файла ${answer_file}>" err
             echo ""
 
             continue
@@ -192,7 +221,7 @@ check_level_answer() {
 
         if ! got=$(normalize_submission_contents "$answer_file"); then
             echo ""
-            print_feedback_file "$path_reject" "<не удалось прочитать ${answer_file}>"
+            print_feedback_file "$path_reject" "<не удалось прочитать ${answer_file}>" err
             echo ""
 
             continue
@@ -200,13 +229,13 @@ check_level_answer() {
 
         if [[ "$got" == "$correct" ]]; then
             echo ""
-            print_feedback_file "$path_ok"
+            print_feedback_file "$path_ok" "" ok
 
             return 0
         fi
 
         echo ""
-        print_feedback_file "$path_reject" "$got"
+        print_feedback_file "$path_reject" "$got" err
         echo ""
     done
 }
