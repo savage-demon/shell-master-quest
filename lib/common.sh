@@ -96,7 +96,7 @@ progress_done() {
 show_welcome_arena() {
     local workdir=$1
 
-    printf '%s# Тест на знание терминала Bash%s\n' "$_H2" "$_ST"
+    printf '%sShell Master%s\n' "$_H2" "$_ST"
     printf '%s---------------------------------------------------------%s\n' "$_DM" "$_ST"
     echo "Откройте второе окно терминала для выполнения задач,"
     echo "перейдите в папку ${workdir}"

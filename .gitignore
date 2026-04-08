@@ -1,7 +1,7 @@
 # Сборка
-/game5_standalone.sh
-/game5
-/game5.x
+/shell-master_standalone.sh
+/shell-master
+/shell-master.x
 *.x.c
 
 # Сгенерированная игра
@@ -16,3 +16,8 @@
 *.swp
 .idea/
 .vscode/
+
+# Старые артефакты сборки
+/game5_standalone.sh
+/game5
+/game5.x

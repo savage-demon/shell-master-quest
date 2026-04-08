@@ -1,12 +1,12 @@
 #!/bin/bash
-# Собирает game5_standalone.sh: распаковка дерева проекта (lib, levels, share, bin) и запуск bin/game5.
+# Собирает shell-master_standalone.sh: распаковка дерева (lib, levels, share, bin) и запуск bin/shell-master.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-OUT="${1:-$ROOT/game5_standalone.sh}"
+OUT="${1:-$ROOT/shell-master_standalone.sh}"
 
-_need=(bin/game5 lib/run.sh lib/common.sh share/outro.txt)
+_need=(bin/shell-master lib/run.sh lib/common.sh share/outro.txt)
 for p in "${_need[@]}"; do
     if [[ ! -e "$ROOT/$p" ]]; then
         echo "gen_standalone: нет $ROOT/$p" >&2
@@ -30,7 +30,7 @@ fi
 {
     echo '#!/usr/bin/env bash'
     echo '# Сгенерировано scripts/gen_standalone.sh — не править вручную.'
-    echo 'game5_install_payload() {'
+    echo 'shell_master_install_payload() {'
     echo '    local _root="$1"'
     echo '    mkdir -p "$_root" || return 1'
 
@@ -50,11 +50,11 @@ fi
     done
 
     echo '}'
-    echo 'GAME5_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/game5.XXXXXX")'
-    echo 'trap '"'"'rm -rf "$GAME5_ROOT"'"'"' EXIT INT TERM HUP'
-    echo 'game5_install_payload "$GAME5_ROOT" || { echo game5: распаковка не удалась >&2; exit 1; }'
-    echo 'chmod +x "$GAME5_ROOT/bin/game5" 2>/dev/null || true'
-    echo 'exec bash "$GAME5_ROOT/bin/game5" "$@"'
+    echo 'SHELL_MASTER_ROOT=$(mktemp -d "${TMPDIR:-/tmp}/shell-master.XXXXXX")'
+    echo 'trap '"'"'rm -rf "$SHELL_MASTER_ROOT"'"'"' EXIT INT TERM HUP'
+    echo 'shell_master_install_payload "$SHELL_MASTER_ROOT" || { echo shell-master: распаковка не удалась >&2; exit 1; }'
+    echo 'chmod +x "$SHELL_MASTER_ROOT/bin/shell-master" 2>/dev/null || true'
+    echo 'exec bash "$SHELL_MASTER_ROOT/bin/shell-master" "$@"'
 } > "$OUT"
 
 chmod +x "$OUT"
