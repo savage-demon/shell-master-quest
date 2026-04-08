@@ -1,7 +1,8 @@
 #!/bin/bash
 # Движок: уровни в levels/<NN>_<name>/ (intro.txt, on_success.txt, on_reject.txt, generate.sh).
 
-GAME="${1:-terminal_game_v1.5}"
+# Базовый каталог игры (относительно cwd или абсолютный путь). Внутри него рядом создаются level_1, level_2, …
+GAME="${1:-quest}"
 
 _LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$_LIB_DIR/.." && pwd)"
@@ -63,17 +64,15 @@ export ROOT
 
 discover_levels
 
-_first_level=1
+_level_idx=0
 
 for level_dir in "${_LEVEL_DIRS[@]}"; do
     validate_level "$level_dir"
 
-    LEVEL_CORRECT=""
+    ((_level_idx++))
+    mkdir -p "$ROOT/level_${_level_idx}" && cd "$ROOT/level_${_level_idx}" || exit 1
 
-    if ((_first_level)); then
-        mkdir -p "$ROOT/level_1" && cd "$ROOT/level_1" || exit 1
-        _first_level=0
-    fi
+    LEVEL_CORRECT=""
 
     echo ""
     print_task_file "$level_dir/intro.txt"

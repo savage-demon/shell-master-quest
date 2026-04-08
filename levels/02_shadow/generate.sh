@@ -1,6 +1,4 @@
-# Дамп shadow в каталоге узла. Текущий каталог — $ROOT/level_1; переходим в каталог сектора.
-
-mkdir "$TARGET_SECTOR" && cd "$TARGET_SECTOR" || exit 1
+# Дамп shadow. Текущий каталог — $ROOT/level_2 (соседний с level_1, не вложенный).
 
 S_NUM=$((10 + RANDOM % 89))
 SEP="##${S_NUM}!!$((RANDOM % 99))"

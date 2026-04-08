@@ -1,4 +1,4 @@
-# VPN-логи. Текущий каталог — $ROOT/level_1/$TARGET_SECTOR (после уровня shadow).
+# VPN-логи. Текущий каталог — $ROOT/level_3.
 
 vpn_decoy_handoff_line() {
     local ts="2026-04-06T$(printf '%02d:%02d:%02d' $((RANDOM % 24)) $((RANDOM % 60)) $((RANDOM % 60)))Z"
