@@ -19,7 +19,7 @@ _L2_PROGRESS_TOTAL=700
 for i in {1..350}; do
     echo "cd sector_$((S_HIST_LO + RANDOM % S_HIST_SPAN))" >> shell_history.log
     echo "ls -la" >> shell_history.log
-    show_progress "$i" "$_L2_PROGRESS_TOTAL" "Синхронизация"
+    show_progress "$i" "$_L2_PROGRESS_TOTAL" "Создание файлов: "
 done
 
 echo "cd $TARGET_SECTOR" >> shell_history.log
@@ -29,7 +29,7 @@ echo "exit" >> shell_history.log
 
 for i in {1..350}; do
     echo "sector_$((S_DB_LO + RANDOM % S_DB_SPAN))" >> available_sectors.db
-    show_progress "$((350 + i))" "$_L2_PROGRESS_TOTAL" "Синхронизация"
+    show_progress "$((350 + i))" "$_L2_PROGRESS_TOTAL" "Создание файлов: "
 done
 
 echo "$TARGET_SECTOR" >> available_sectors.db
