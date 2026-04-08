@@ -94,6 +94,12 @@ for level_dir in "${_LEVEL_DIRS[@]}"; do
     echo "---------------------------------------------------------"
 
     check_level_answer "$LEVEL_CORRECT" "$level_dir/on_success.txt" "$level_dir/on_reject.txt" || exit 1
+
+    if ((_level_idx < ${#_LEVEL_DIRS[@]})); then
+        echo ""
+        echo "Нажмите Enter, чтобы перейти к следующему уровню..."
+        read -r || exit 1
+    fi
 done
 
 show_outro_from_file "$PROJECT_ROOT/share/outro.txt"
