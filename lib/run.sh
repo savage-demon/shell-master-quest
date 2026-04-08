@@ -8,7 +8,7 @@ PROJECT_ROOT="$(cd "$_LIB_DIR/.." && pwd)"
 
 source "$_LIB_DIR/common.sh"
 
-PLAYER=""
+PLAYER="${USER:-игрок}"
 
 declare -a _LEVEL_DIRS=()
 discover_levels() {
@@ -43,8 +43,18 @@ validate_level() {
     done
 }
 
+if [[ "$GAME" == /* ]]; then
+    _GAME_WORKDIR_ABS="$GAME"
+else
+    _GAME_WORKDIR_ABS="$(pwd)/$GAME"
+fi
+
+if command -v realpath >/dev/null 2>&1; then
+    _GAME_WORKDIR_ABS="$(realpath -m "$_GAME_WORKDIR_ABS")"
+fi
+
 clear
-show_connect
+show_welcome_arena "$_GAME_WORKDIR_ABS"
 
 rm -rf "$GAME" && mkdir -p "$GAME" && cd "$GAME" || exit
 ROOT=$(pwd)

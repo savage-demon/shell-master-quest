@@ -195,15 +195,16 @@ system_say() {
     system_emit_wrapped_paragraph "$msg"
 }
 
-show_connect() {
-    system_say "установка зашифрованного канала связи..."
-    echo -ne "\033[1;36m[system]:\033[0m Введите ваш идентификатор доступа \033[1;37m(LOGIN)\033[0m: "
-    read -r PLAYER || exit 1
-    PLAYER="${PLAYER#"${PLAYER%%[![:space:]]*}"}"
-    PLAYER="${PLAYER%"${PLAYER##*[![:space:]]}"}"
-    [[ -z "$PLAYER" ]] && PLAYER="OPERATOR"
+# Абсолютный путь к каталогу игры (второе окно терминала).
+show_welcome_arena() {
+    local workdir=$1
 
-    system_say "добро пожаловать в сеть, ${PLAYER}. соединение установлено."
+    echo "# Тест на знание терминала Bash"
+    echo "---------------------------------------------------------"
+    echo "Откройте второе окно терминала для выполнения задач,"
+    echo "перейдите в папку $workdir"
+    echo "Нажмите [Enter], чтобы начать..."
+    read -r || exit 1
 }
 
 operator_level_from_file() {
