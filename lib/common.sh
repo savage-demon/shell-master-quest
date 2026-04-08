@@ -26,6 +26,72 @@ tpl_expand() {
     printf '%s' "$s"
 }
 
+# Сброс / заголовок уровня / жирный / приглушённый разделитель
+_ST=$'\033[0m'
+_H2=$'\033[1;36m'
+_BD=$'\033[1m'
+_DM=$'\033[2m'
+
+# Пары **текст** → жирный (без звёздочек на экране).
+format_inline_bold() {
+    local s=$1 out="" pre mid
+
+    while [[ "$s" == *'**'* ]]; do
+        pre="${s%%\*\*}"
+        s="${s#"$pre"}"
+
+        if [[ "${s:0:2}" != '**' ]]; then
+            printf '%s%s' "$out$pre" "$s"
+
+            return
+        fi
+
+        s="${s:2}"
+        mid="${s%%\*\*}"
+
+        if [[ "$mid" == "$s" ]]; then
+            printf '%s%s**%s' "$out" "$pre" "$s"
+
+            return
+        fi
+
+        s="${s#"$mid"}"
+        s="${s:2}"
+        out+="$pre${_BD}$mid${_ST}"
+    done
+
+    printf '%s%s' "$out" "$s"
+}
+
+# Одна строка задания: md-метки превращаются в цвета (## и ** скрыты).
+print_formatted_line() {
+    local raw=$1
+    local ans="${2-}"
+    local line
+
+    line=$(tpl_expand "$raw" "$ans")
+
+    if [[ "$line" =~ ^##[[:space:]]+(.+)$ ]]; then
+        printf '%s%s%s\n' "$_H2" "${BASH_REMATCH[1]}" "$_ST"
+
+        return
+    fi
+
+    if [[ "$line" =~ ^---+[[:space:]]*$ ]]; then
+        printf '%s%s%s\n' "$_DM" "---------------------------------------------------------" "$_ST"
+
+        return
+    fi
+
+    if [[ -z "${line// }" ]]; then
+        echo ""
+
+        return
+    fi
+
+    printf '%s\n' "$(format_inline_bold "$line")"
+}
+
 progress_done() {
     echo ""
 }
@@ -33,21 +99,21 @@ progress_done() {
 show_welcome_arena() {
     local workdir=$1
 
-    echo "# Тест на знание терминала Bash"
-    echo "---------------------------------------------------------"
+    printf '%s# Тест на знание терминала Bash%s\n' "$_H2" "$_ST"
+    printf '%s---------------------------------------------------------%s\n' "$_DM" "$_ST"
     echo "Откройте второе окно терминала для выполнения задач,"
-    echo "перейдите в папку $workdir"
+    echo "перейдите в папку ${workdir}"
     echo "Нажмите [Enter], чтобы начать..."
     read -r || exit 1
 }
 
-# Текст задания из intro.txt (построчно, без подстановки имён файлов в glob).
+# Условие задачи из intro.txt.
 print_task_file() {
     local path=$1
     local line
 
     while IFS= read -r line || [[ -n $line ]]; do
-        echo "$(tpl_expand "$line")"
+        print_formatted_line "${line%$'\r'}"
     done < "$path"
 }
 
@@ -86,8 +152,7 @@ print_feedback_file() {
     fi
 
     while IFS= read -r line || [[ -n $line ]]; do
-        line="${line%$'\r'}"
-        echo "$(tpl_expand "$line" "$ans")"
+        print_formatted_line "${line%$'\r'}" "$ans"
     done < "$path"
 }
 
@@ -126,10 +191,13 @@ show_outro_from_file() {
     echo ""
 
     while IFS= read -r line || [[ -n $line ]]; do
-        line=$(tpl_expand "$line")
-        [[ -z "${line// }" ]] && continue
+        if [[ -z "${line// }" ]]; then
+            echo ""
 
-        echo "$line"
+            continue
+        fi
+
+        print_formatted_line "$line"
     done < "$outro_path"
 
     echo ""
