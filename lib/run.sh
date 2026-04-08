@@ -72,6 +72,8 @@ for level_dir in "${_LEVEL_DIRS[@]}"; do
     ((_level_idx++))
     mkdir -p "$ROOT/level_${_level_idx}" && cd "$ROOT/level_${_level_idx}" || exit 1
 
+    clear
+
     LEVEL_CORRECT=""
 
     echo ""
