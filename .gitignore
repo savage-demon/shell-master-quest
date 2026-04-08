@@ -1,0 +1,18 @@
+# Сборка
+/game5_standalone.sh
+/game5
+/game5.x
+*.x.c
+
+# Сгенерированная игра
+/terminal_game_*/
+
+# Локальные тяжёлые дампы
+/test/
+
+# ОС и редакторы
+.DS_Store
+*~
+*.swp
+.idea/
+.vscode/
