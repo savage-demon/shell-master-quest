@@ -1,7 +1,7 @@
-# Сборка: упакованный скрипт и опционально бинарник shc.
-#
-#   make            → ./shell-master (нужны shc, cc)
-#   make standalone → shell-master_standalone.sh
+# Shell Master — сборка standalone и опционально бинарника shc.
+#   make / make help — список целей
+#   make all           — ./shell-master (нужны shc, cc)
+#   make standalone    — shell-master_standalone.sh
 #   make clean
 #
 SHELL := /bin/bash
@@ -15,7 +15,19 @@ PAYLOAD_FILES   := $(shell find $(ROOT)/lib $(ROOT)/levels $(ROOT)/share $(ROOT)
 
 SHC ?= shc
 
-.PHONY: all clean standalone
+.DEFAULT_GOAL := help
+
+.PHONY: help all clean standalone
+
+help:
+	@echo "Shell Master — цели make:"
+	@echo ""
+	@echo "  make help        Справка (по умолчанию при вызове make без аргументов)."
+	@echo "  make all         Собрать ./shell-master через shc (нужны shc и компилятор)."
+	@echo "  make standalone  Только ./shell-master_standalone.sh (bash, без shc)."
+	@echo "  make clean       Удалить артефакты сборки (standalone, бинарник, *.x.c)."
+	@echo ""
+	@echo "  Переменная SHC=... задаёт команду shc, если она не в PATH."
 
 all: $(COMPILED_BIN)
 
