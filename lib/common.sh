@@ -107,7 +107,8 @@ show_welcome_arena() {
     printf '%s---------------------------------------------------------%s\n' "$_DM" "$_ST"
     echo "Откройте второе окно терминала для выполнения задач."
     echo "Базовый каталог квеста: ${workdir}"
-    echo "Файлы каждого уровня лежат в соседних папках level_1, level_2, … внутри него."
+    echo "Файлы с заданиями будут созданы в этом каталоге."
+    echo ""
     echo "Нажмите [Enter], чтобы начать..."
     read -r || exit 1
 }
@@ -189,12 +190,41 @@ print_feedback_file() {
     done < "$path"
 }
 
-# Содержимое файла ответа: без CRLF, trim пробелов по краям всего текста.
+# Содержимое файла ответа: mode single — весь файл как одна строка (trim краёв);
+# mode lines — непустые строки по отдельности (trim), без пустых между, склейка через \n.
 normalize_submission_contents() {
     local path=$1
+    local mode="${2:-single}"
     local s
+    local ln
+    local -a acc
+    local out=""
+    local i
 
     [[ -f "$path" && -r "$path" ]] || return 1
+
+    if [[ "$mode" == lines ]]; then
+        acc=()
+
+        while IFS= read -r ln || [[ -n $ln ]]; do
+            ln="${ln%$'\r'}"
+            ln="${ln#"${ln%%[![:space:]]*}"}"
+            ln="${ln%"${ln##*[![:space:]]}"}"
+            [[ -z "$ln" ]] && continue
+
+            acc+=("$ln")
+        done < "$path"
+
+        for ((i = 0; i < ${#acc[@]}; i++)); do
+            [[ -n "$out" ]] && out+=$'\n'
+
+            out+="${acc[$i]}"
+        done
+
+        printf '%s' "$out"
+
+        return 0
+    fi
 
     s=$(<"$path") || return 1
     s=${s//$'\r'/}
@@ -214,8 +244,7 @@ check_level_answer() {
 
     while true; do
         echo ""
-        echo "Запишите ответ в файл «${answer_file}» в этом каталоге (одна строка, как в условии)."
-        echo "Когда файл сохранён, нажмите Enter для проверки."
+        echo "Нажмите Enter для проверки."
         read -r _ || return 1
 
         if [[ ! -f "$answer_file" ]]; then
@@ -232,12 +261,28 @@ check_level_answer() {
             continue
         fi
 
-        if ! got=$(normalize_submission_contents "$answer_file"); then
+        if ! got=$(normalize_submission_contents "$answer_file" "${LEVEL_ANSWER_MODE:-single}"); then
             echo ""
             print_feedback_file "$path_reject" "<не удалось прочитать ${answer_file}>" err
             echo ""
 
             continue
+        fi
+
+        if [[ -n "${LEVEL_ANSWER_EXPECT_LINES:-}" ]]; then
+            local _lc=0
+
+            while IFS= read -r _ln || [[ -n "${_ln}" ]]; do
+                ((_lc++))
+            done < <(printf '%s' "$got")
+
+            if ((_lc != LEVEL_ANSWER_EXPECT_LINES)); then
+                echo ""
+                printf '%b%s%b\n' "$_WRN" "В «${answer_file}» должно быть ровно ${LEVEL_ANSWER_EXPECT_LINES} строк с ответом (без пустых), сейчас: ${_lc}." "$_ST"
+                echo ""
+
+                continue
+            fi
         fi
 
         if [[ "$got" == "$correct" ]]; then

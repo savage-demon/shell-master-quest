@@ -7,7 +7,7 @@
 | `intro.txt` | Условие задачи (обычный текст / markdown) |
 | `on_success.txt` | Сообщение при верном ответе |
 | `on_reject.txt` | Сообщение при ошибке; плейсхолдеры `@ans@` и `@ANS@` |
-| `generate.sh` | Файлы задания; **`LEVEL_CORRECT`** (эталон), опционально **`LEVEL_ANSWER_FILE`** (имя файла ответа; иначе `answer.txt`) |
+| `generate.sh` | Файлы задания; **`LEVEL_CORRECT`**, опционально **`LEVEL_ANSWER_FILE`** (`answer.txt`), **`LEVEL_ANSWER_MODE`** (`single` / **`lines`** — построчно), **`LEVEL_ANSWER_EXPECT_LINES`** (строгое число строк) |
 
 Проверка: игрок создаёт файл ответа в каталоге уровня и нажимает Enter; движок сравнивает содержимое с **`LEVEL_CORRECT`**.
 

@@ -11,5 +11,5 @@ HDR=$(head -1 shadow_fragment.db) && SEP="${HDR#type}" && SEP="${SEP%%date*}" &&
 SID=$(awk 'match($0, /sess=sess[0-9]+/) { id = substr($0, RSTART, RLENGTH); c[id]++ } END { for (i in c) if (c[i] == 2) print i }' vpn_*.log | head -1)
 grep -hF "$SID" vpn_*.log | grep 'trace_exit_node=' | sed 's/.*trace_exit_node=\([a-z0-9]*\).*/\1/' > answer.txt
 
-# --- Уровень 4 — каталог: GAME/level_4 ---
-grep 'STATUS:500' access.log | grep -oE 'IP:[0-9]+(\.[0-9]+){3}' | sed 's/^IP://' | sort | uniq -c | sort -k1,1nr | head -3 | awk '{printf "%s%s", $2, (NR < 3 ? " " : "")}' > answer.txt
+# --- Уровень 4 — каталог: GAME/level_4 (три строки в answer.txt) ---
+grep 'STATUS:500' access.log | grep -oE 'IP:[0-9]+(\.[0-9]+){3}' | sed 's/^IP://' | sort | uniq -c | sort -k1,1nr | head -3 | awk '{print $2}' > answer.txt

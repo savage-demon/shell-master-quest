@@ -3,7 +3,10 @@
 T1="10.20.1.100"
 T2="10.20.2.200"
 T3="10.20.3.50"
-LEVEL_CORRECT="$T1 $T2 $T3"
+
+LEVEL_CORRECT=$(printf '%s\n%s\n%s' "$T1" "$T2" "$T3")
+LEVEL_ANSWER_MODE=lines
+LEVEL_ANSWER_EXPECT_LINES=3
 
 # Число ответов 500 для лидеров (строго убывает) и «шумовых» IP с 500 (все меньше T3).
 N_T1=55

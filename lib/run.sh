@@ -77,6 +77,8 @@ for level_dir in "${_LEVEL_DIRS[@]}"; do
 
     LEVEL_CORRECT=""
     LEVEL_ANSWER_FILE=""
+    LEVEL_ANSWER_MODE=""
+    LEVEL_ANSWER_EXPECT_LINES=""
 
     echo ""
     print_task_file "$level_dir/intro.txt"
