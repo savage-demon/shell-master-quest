@@ -6,7 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 OUT="${1:-$ROOT/shell-master_standalone.sh}"
 
-_need=(bin/shell-master lib/run.sh lib/common.sh share/outro.txt)
+_need=(bin/shell-master lib/run.sh lib/common.sh share/outro.txt share/missing_answer.txt)
 for p in "${_need[@]}"; do
     if [[ ! -e "$ROOT/$p" ]]; then
         echo "gen_standalone: нет $ROOT/$p" >&2

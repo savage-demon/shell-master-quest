@@ -6,6 +6,7 @@ GAME="${1:-quest}"
 
 _LIB_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "$_LIB_DIR/.." && pwd)"
+export PROJECT_ROOT
 
 source "$_LIB_DIR/common.sh"
 

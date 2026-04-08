@@ -15,6 +15,7 @@ gen_name() {
 tpl_expand() {
     local s=$1
     local ans="${2-}"
+    local file_hint="${3-}"
 
     s=${s//@ROOT@/${ROOT-}}
     s=${s//@PLAYER@/${PLAYER-}}
@@ -22,6 +23,10 @@ tpl_expand() {
     s=${s//@FLAG@/${FINAL_FLAG_ID-}}
     s=${s//@ANS@/$ans}
     s=${s//@ans@/$ans}
+
+    if [[ -n "$file_hint" ]]; then
+        s=${s//@FILE@/$file_hint}
+    fi
 
     printf '%s' "$s"
 }
@@ -68,7 +73,7 @@ print_formatted_line() {
     local ans="${2-}"
     local line
 
-    line=$(tpl_expand "$raw" "$ans")
+    line=$(tpl_expand "$raw" "$ans" "")
 
     if [[ "$line" =~ ^##[[:space:]]+(.+)$ ]]; then
         printf '%s%s%s\n' "$_H2" "${BASH_REMATCH[1]}" "$_ST"
@@ -140,6 +145,7 @@ print_feedback_file() {
     local path=$1
     local ans="${2-}"
     local tone="${3-}"
+    local file_hint="${4-}"
     local line
     local color=""
 
@@ -150,7 +156,7 @@ print_feedback_file() {
 
     if [[ ! -f "$path" ]]; then
         if [[ -n "$ans" ]]; then
-            line="$(tpl_expand "Ответ «@ans@» не подходит. Нет файла уведомления: ${path##*/}" "$ans")"
+            line="$(tpl_expand "Ответ «@ans@» не подходит. Нет файла уведомления: ${path##*/}" "$ans" "$file_hint")"
         else
             line="Нет файла уведомления: ${path##*/}"
         fi
@@ -166,7 +172,7 @@ print_feedback_file() {
 
     while IFS= read -r line || [[ -n $line ]]; do
         if [[ -n "$color" ]]; then
-            line="$(tpl_expand "${line%$'\r'}" "$ans")"
+            line="$(tpl_expand "${line%$'\r'}" "$ans" "$file_hint")"
 
             if [[ -z "${line// }" ]]; then
                 echo ""
@@ -203,6 +209,7 @@ check_level_answer() {
     local path_ok=$2
     local path_reject=$3
     local answer_file=$4
+    local path_missing="${5:-${PROJECT_ROOT}/share/missing_answer.txt}"
     local got=""
 
     while true; do
@@ -213,7 +220,13 @@ check_level_answer() {
 
         if [[ ! -f "$answer_file" ]]; then
             echo ""
-            print_feedback_file "$path_reject" "<нет файла ${answer_file}>" err
+
+            if [[ -f "$path_missing" ]]; then
+                print_feedback_file "$path_missing" "" err "$answer_file"
+            else
+                printf '%b%s%b\n' "$_WRN" "Файл «${answer_file}» в этом каталоге не найден. Создайте его с ответом и снова нажмите Enter." "$_ST"
+            fi
+
             echo ""
 
             continue
