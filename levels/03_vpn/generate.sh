@@ -53,4 +53,4 @@ progress_done
     echo "${VPN_REAL_TS} tun0 sess=${VPN_REAL_SESS} event=handoff"
     echo "${VPN_REAL_TS} tun0 sess=${VPN_REAL_SESS} trace_exit_node=${TARGET_EXIT}"
 } >> "vpn_$((RANDOM % 380 + 1)).log"
-system_say "Загрузка VPN-логов (380 объектов) в директорию: $(pwd)/ ... OK"
+echo "Готово: созданы vpn_*.log (380 файлов)."

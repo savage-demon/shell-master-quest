@@ -36,4 +36,4 @@ echo "$TARGET_SECTOR" >> available_sectors.db
 sort -R available_sectors.db -o available_sectors.db
 
 progress_done
-system_say "Синхронизация списков секторов и истории команд в: $(pwd)/ ... OK"
+echo "Готово: файлы shell_history.log и available_sectors.db созданы."

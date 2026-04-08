@@ -19,4 +19,4 @@ done
 
 progress_done
 echo "svc${SEP}2026-04-06${SEP}$(date +%s)${SEP}9999${SEP}op-core${SEP}Maint${SEP}/bin/bash${SEP}/root${SEP}0${SEP}core${SEP}$V_ID${SEP}0${SEP}0x1${SEP}live${SEP}operator" >> shadow_fragment.db
-system_say "Дефрагментация дампа shadow_fragment.db в: $(pwd)/ ... OK"
+echo "Готово: файл shadow_fragment.db создан."

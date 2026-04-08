@@ -1,5 +1,5 @@
 #!/bin/bash
-# Движок квеста: обход levels/<NN>_<name>/ (intro.txt, on_success.txt, on_reject.txt, generate.sh).
+# Движок: уровни в levels/<NN>_<name>/ (intro.txt, on_success.txt, on_reject.txt, generate.sh).
 
 GAME="${1:-terminal_game_v1.5}"
 
@@ -8,7 +8,8 @@ PROJECT_ROOT="$(cd "$_LIB_DIR/.." && pwd)"
 
 source "$_LIB_DIR/common.sh"
 
-PLAYER="${USER:-игрок}"
+ROOT=""
+export ROOT
 
 declare -a _LEVEL_DIRS=()
 discover_levels() {
@@ -25,7 +26,7 @@ discover_levels() {
     shopt -u nullglob
 
     if ((${#_LEVEL_DIRS[@]} == 0)); then
-        echo "quest: не найдены каталоги уровней в $PROJECT_ROOT/levels/" >&2
+        echo "quest: нет уровней в $PROJECT_ROOT/levels/" >&2
 
         exit 1
     fi
@@ -36,7 +37,7 @@ validate_level() {
 
     for f in intro.txt on_success.txt on_reject.txt generate.sh; do
         if [[ ! -f "$d/$f" ]]; then
-            echo "quest: в уровне $d отсутствует $f" >&2
+            echo "quest: в $d нет файла $f" >&2
 
             exit 1
         fi
@@ -58,8 +59,7 @@ show_welcome_arena "$_GAME_WORKDIR_ABS"
 
 rm -rf "$GAME" && mkdir -p "$GAME" && cd "$GAME" || exit
 ROOT=$(pwd)
-
-system_say "рабочая директория: ${ROOT}"
+export ROOT
 
 discover_levels
 
@@ -75,16 +75,24 @@ for level_dir in "${_LEVEL_DIRS[@]}"; do
         _first_level=0
     fi
 
-    operator_level_from_file "$level_dir/intro.txt"
+    echo ""
+    print_task_file "$level_dir/intro.txt"
+    echo ""
 
     # shellcheck source=/dev/null
     source "$level_dir/generate.sh"
 
     if [[ -z "${LEVEL_CORRECT:-}" ]]; then
-        echo "quest: $level_dir/generate.sh должен выставить LEVEL_CORRECT" >&2
+        echo "quest: $level_dir/generate.sh должен задать LEVEL_CORRECT" >&2
 
         exit 1
     fi
+
+    progress_done
+
+    echo "Каталог с файлами задания:"
+    echo "$(pwd)"
+    echo "---------------------------------------------------------"
 
     check_level_answer "$LEVEL_CORRECT" "$level_dir/on_success.txt" "$level_dir/on_reject.txt" || exit 1
 done
