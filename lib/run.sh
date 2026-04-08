@@ -75,6 +75,7 @@ for level_dir in "${_LEVEL_DIRS[@]}"; do
     clear
 
     LEVEL_CORRECT=""
+    LEVEL_ANSWER_FILE=""
 
     echo ""
     print_task_file "$level_dir/intro.txt"
@@ -89,13 +90,21 @@ for level_dir in "${_LEVEL_DIRS[@]}"; do
         exit 1
     fi
 
+    : "${LEVEL_ANSWER_FILE:=answer.txt}"
+
+    if [[ "$LEVEL_ANSWER_FILE" != "${LEVEL_ANSWER_FILE##*/}" || -z "$LEVEL_ANSWER_FILE" || "$LEVEL_ANSWER_FILE" == "." || "$LEVEL_ANSWER_FILE" == ".." ]]; then
+        echo "quest: LEVEL_ANSWER_FILE должен быть простым именем файла (без /)" >&2
+
+        exit 1
+    fi
+
     progress_done
 
     echo "Каталог с файлами задания:"
     echo "$(pwd)"
     echo "---------------------------------------------------------"
 
-    check_level_answer "$LEVEL_CORRECT" "$level_dir/on_success.txt" "$level_dir/on_reject.txt" || exit 1
+    check_level_answer "$LEVEL_CORRECT" "$level_dir/on_success.txt" "$level_dir/on_reject.txt" "$LEVEL_ANSWER_FILE" || exit 1
 
     if ((_level_idx < ${#_LEVEL_DIRS[@]})); then
         echo ""

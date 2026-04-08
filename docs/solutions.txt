@@ -1,15 +1,15 @@
 # Shell Master — четыре уровня (спойлеры). Путь к базе вместо GAME (например ./quest).
+# Ответ записывается в answer.txt в каталоге уровня; в окне квеста — Enter.
 
 # --- Уровень 1 — каталог: GAME/level_1 ---
-comm -12 <(grep -oE 'cd sector_[0-9]+' shell_history.log | sed 's/^cd //' | sort -u) <(sort available_sectors.db)
+comm -12 <(grep -oE 'cd sector_[0-9]+' shell_history.log | sed 's/^cd //' | sort -u) <(sort available_sectors.db) | head -1 > answer.txt
 
 # --- Уровень 2 — каталог: GAME/level_2 (рядом с level_1) ---
-HDR=$(head -1 shadow_fragment.db) && SEP="${HDR#type}" && SEP="${SEP%%date*}" && awk -F"$SEP" 'NR>1 && $15=="operator" {print $11; exit}' shadow_fragment.db
+HDR=$(head -1 shadow_fragment.db) && SEP="${HDR#type}" && SEP="${SEP%%date*}" && awk -F"$SEP" 'NR>1 && $15=="operator" {print $11; exit}' shadow_fragment.db > answer.txt
 
 # --- Уровень 3 — каталог: GAME/level_3 ---
-awk 'match($0, /sess=sess[0-9]+/) { id = substr($0, RSTART, RLENGTH); c[id]++ } END { for (i in c) if (c[i] == 2) print i }' vpn_*.log
 SID=$(awk 'match($0, /sess=sess[0-9]+/) { id = substr($0, RSTART, RLENGTH); c[id]++ } END { for (i in c) if (c[i] == 2) print i }' vpn_*.log | head -1)
-grep -hF "$SID" vpn_*.log | grep 'trace_exit_node=' | sed 's/.*trace_exit_node=\([a-z0-9]*\).*/\1/'
+grep -hF "$SID" vpn_*.log | grep 'trace_exit_node=' | sed 's/.*trace_exit_node=\([a-z0-9]*\).*/\1/' > answer.txt
 
 # --- Уровень 4 — каталог: GAME/level_4 ---
-grep 'STATUS:500' access.log | grep -oE 'IP:[0-9]+(\.[0-9]+){3}' | sed 's/^IP://' | sort | uniq -c | sort -k1,1nr | head -3 | awk '{printf "%s%s", $2, (NR < 3 ? " " : "")}'; echo
+grep 'STATUS:500' access.log | grep -oE 'IP:[0-9]+(\.[0-9]+){3}' | sed 's/^IP://' | sort | uniq -c | sort -k1,1nr | head -3 | awk '{printf "%s%s", $2, (NR < 3 ? " " : "")}' > answer.txt

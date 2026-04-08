@@ -154,20 +154,51 @@ print_feedback_file() {
     done < "$path"
 }
 
+# Содержимое файла ответа: без CRLF, trim пробелов по краям всего текста.
+normalize_submission_contents() {
+    local path=$1
+    local s
+
+    [[ -f "$path" && -r "$path" ]] || return 1
+
+    s=$(<"$path") || return 1
+    s=${s//$'\r'/}
+    s="${s#"${s%%[![:space:]]*}"}"
+    s="${s%"${s##*[![:space:]]}"}"
+
+    printf '%s' "$s"
+}
+
 check_level_answer() {
     local correct=$1
     local path_ok=$2
     local path_reject=$3
-    local input=""
+    local answer_file=$4
+    local got=""
 
     while true; do
         echo ""
-        printf 'Ответ: '
-        read -r input || return 1
-        input="${input#"${input%%[![:space:]]*}"}"
-        input="${input%"${input##*[![:space:]]}"}"
+        echo "Запишите ответ в файл «${answer_file}» в этом каталоге (одна строка, как в условии)."
+        echo "Когда файл сохранён, нажмите Enter для проверки."
+        read -r _ || return 1
 
-        if [[ "$input" == "$correct" ]]; then
+        if [[ ! -f "$answer_file" ]]; then
+            echo ""
+            print_feedback_file "$path_reject" "<нет файла ${answer_file}>"
+            echo ""
+
+            continue
+        fi
+
+        if ! got=$(normalize_submission_contents "$answer_file"); then
+            echo ""
+            print_feedback_file "$path_reject" "<не удалось прочитать ${answer_file}>"
+            echo ""
+
+            continue
+        fi
+
+        if [[ "$got" == "$correct" ]]; then
             echo ""
             print_feedback_file "$path_ok"
 
@@ -175,7 +206,7 @@ check_level_answer() {
         fi
 
         echo ""
-        print_feedback_file "$path_reject" "$input"
+        print_feedback_file "$path_reject" "$got"
         echo ""
     done
 }
