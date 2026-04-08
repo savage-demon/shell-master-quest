@@ -33,31 +33,28 @@ _BD=$'\033[1m'
 _DM=$'\033[2m'
 
 # Пары **текст** → жирный (без звёздочек на экране).
+# Важно: ${s%%\*\*} в bash отрезает только суффикс «**», а не «до первой пары» —
+# поэтому разбор только через первую/вторую замену «**».
 format_inline_bold() {
-    local s=$1 out="" pre mid
+    local s=$1 out="" pre mid post t u
+    local mark=$'\x1E'
 
     while [[ "$s" == *'**'* ]]; do
-        pre="${s%%\*\*}"
-        s="${s#"$pre"}"
+        t="${s/\*\*/$mark}"
+        pre="${t%%$mark*}"
+        rest="${t#*$mark}"
 
-        if [[ "${s:0:2}" != '**' ]]; then
-            printf '%s%s' "$out$pre" "$s"
-
-            return
-        fi
-
-        s="${s:2}"
-        mid="${s%%\*\*}"
-
-        if [[ "$mid" == "$s" ]]; then
-            printf '%s%s**%s' "$out" "$pre" "$s"
+        if [[ "$rest" != *'**'* ]]; then
+            printf '%s%s**%s' "$out" "$pre" "$rest"
 
             return
         fi
 
-        s="${s#"$mid"}"
-        s="${s:2}"
+        u="${rest/\*\*/$mark}"
+        mid="${u%%$mark*}"
+        post="${u#*$mark}"
         out+="$pre${_BD}$mid${_ST}"
+        s="$post"
     done
 
     printf '%s%s' "$out" "$s"
