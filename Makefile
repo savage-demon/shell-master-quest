@@ -2,7 +2,8 @@
 #   make / make help — список целей
 #   make all           — ./shell-master (нужны shc, cc)
 #   make standalone    — shell-master_standalone.sh
-#   make clean
+#   make clean     — артефакты сборки (+ устаревшие имена game5*)
+#   make distclean — то же + quest/ и terminal_game_* в корне репо
 #
 SHELL := /bin/bash
 ROOT  := $(abspath .)
@@ -17,7 +18,7 @@ SHC ?= shc
 
 .DEFAULT_GOAL := help
 
-.PHONY: help all clean standalone
+.PHONY: help all clean distclean standalone
 
 help:
 	@echo "Shell Master — цели make:"
@@ -25,7 +26,8 @@ help:
 	@echo "  make help        Справка (по умолчанию при вызове make без аргументов)."
 	@echo "  make all         Собрать ./shell-master через shc (нужны shc и компилятор)."
 	@echo "  make standalone  Только ./shell-master_standalone.sh (bash, без shc)."
-	@echo "  make clean       Удалить артефакты сборки (standalone, бинарник, *.x.c)."
+	@echo "  make clean       Артефакты сборки shc/standalone и старые game5* в корне репо."
+	@echo "  make distclean   Как clean + каталоги данных игры: ./quest и ./terminal_game_*."
 	@echo ""
 	@echo "  Переменная SHC=... задаёт команду shc, если она не в PATH."
 
@@ -45,4 +47,10 @@ $(COMPILED_BIN): $(STANDALONE_SH)
 	@echo "Готово: $(COMPILED_BIN)"
 
 clean:
-	rm -f "$(STANDALONE_SH)" "$(COMPILED_BIN)" "$(STANDALONE_SH).x.c" "$(COMPILED_BIN).x.c"
+	rm -f "$(STANDALONE_SH)" "$(COMPILED_BIN)" "$(ROOT)/shell-master.x"
+	rm -f "$(STANDALONE_SH).x.c" "$(COMPILED_BIN).x.c"
+	rm -f "$(ROOT)/game5_standalone.sh" "$(ROOT)/game5" "$(ROOT)/game5.x"
+	rm -f "$(ROOT)/game5_standalone.sh.x.c" "$(ROOT)/game5.x.c"
+
+distclean: clean
+	rm -rf "$(ROOT)/quest" $(wildcard $(ROOT)/terminal_game_*)

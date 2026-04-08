@@ -36,8 +36,9 @@
 - Бинарник через **shc** + компилятор:
 
   ```bash
-  make help    # список целей (то же, что просто make)
+  make help     # список целей (то же, что просто make)
   make all
+  make clean    # артефакты сборки; make distclean — ещё ./quest и ./terminal_game_*
   ```
 
 ## Старый квест (v0.2)
