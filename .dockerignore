@@ -1,0 +1,14 @@
+.git
+.codex
+quest
+terminal_game_*
+test
+shell-master
+shell-master.x
+shell-master_standalone.sh
+*.x.c
+.DS_Store
+*.swp
+*~
+.idea
+.vscode

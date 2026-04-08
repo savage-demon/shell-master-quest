@@ -59,7 +59,28 @@ fi
 clear
 show_welcome_arena "$_GAME_WORKDIR_ABS"
 
-rm -rf "$GAME" && mkdir -p "$GAME" && cd "$GAME" || exit
+if [[ -e "$GAME" ]]; then
+    if [[ ! -d "$GAME" ]]; then
+        echo "quest: путь \"$GAME\" существует, но это не каталог" >&2
+
+        exit 1
+    fi
+
+    shopt -s nullglob dotglob
+    _game_existing_entries=("$GAME"/*)
+    shopt -u nullglob dotglob
+
+    if ((${#_game_existing_entries[@]} > 0)); then
+        echo "quest: каталог \"$GAME\" не пуст" >&2
+        echo "Укажите новый или пустой каталог для файлов квеста." >&2
+
+        exit 1
+    fi
+else
+    mkdir -p "$GAME" || exit 1
+fi
+
+cd "$GAME" || exit 1
 ROOT=$(pwd)
 export ROOT
 
